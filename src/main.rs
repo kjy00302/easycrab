@@ -1,7 +1,7 @@
 use clap::Parser;
 
 use std::fs::File;
-use std::io::{prelude::*, SeekFrom};
+use std::io::{prelude::*, BufReader, BufWriter, SeekFrom};
 
 use generic_array::{typenum::U16, GenericArray};
 
@@ -53,7 +53,7 @@ fn main() {
         panic!("Destination file already exists")
     }
 
-    let mut enc_file = File::open(args.file).unwrap();
+    let mut enc_file = BufReader::new(File::open(args.file).unwrap());
 
     let mut magic = [0u8; 7];
     enc_file.read_exact(&mut magic).unwrap();
@@ -109,7 +109,7 @@ fn main() {
     let mut dec_file = if args.no_write {
         None
     } else {
-        Some(File::create(new_file_name).unwrap())
+        Some(BufWriter::new(File::create(new_file_name).unwrap()))
     };
     let mut filehasher = Sha1::new();
 
